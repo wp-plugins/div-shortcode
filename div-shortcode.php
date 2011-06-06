@@ -10,22 +10,23 @@ Author URI: http://www.billerickson.net
 
 
 /* Open Div */ 
-add_shortcode('div', 'be_div_shortcode');
-function be_div_shortcode($atts) {
-	extract(shortcode_atts(array('class' => '', 'id' => '' ), $atts));
-	$return = '<div';
-	if (!empty($class)) $return .= ' class="'.$class.'"';
-	if (!empty($id)) $return .= ' id="'.$id.'"';
-	$return .= '>';
-	return $return;
+if (!function_exists('be_div_shortcode')) {
+	add_shortcode('div', 'be_div_shortcode');
+	function be_div_shortcode($atts) {
+		extract(shortcode_atts(array('class' => '', 'id' => '' ), $atts));
+		$return = '<div';
+		if (!empty($class)) $return .= ' class="'.$class.'"';
+		if (!empty($id)) $return .= ' id="'.$id.'"';
+		$return .= '>';
+		return $return;
+	}
 }
 
 /* Close Div */
-add_shortcode('end-div', 'be_end_div_shortcode');
-function be_end_div_shortcode($atts) {
-	return '</div>';
+if (!function_exists('be_end_div_shortcode')) {
+	add_shortcode('end-div', 'be_end_div_shortcode');
+	function be_end_div_shortcode($atts) {
+		return '</div>';
+	}
 }
-
-
-
 ?>

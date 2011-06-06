@@ -10,8 +10,8 @@ Author URI: http://www.billerickson.net
 
 
 /* Open Div */ 
-add_shortcode('div', 'be_div_shortcode');
-function be_div_shortcode($atts) {
+add_shortcode('div', 'be_plugin_div_shortcode');
+function be_plugin_div_shortcode($atts) {
 	extract(shortcode_atts(array('class' => '', 'id' => '' ), $atts));
 	$return = '<div';
 	if (!empty($class)) $return .= ' class="'.$class.'"';
@@ -21,8 +21,8 @@ function be_div_shortcode($atts) {
 }
 
 /* Close Div */
-add_shortcode('end-div', 'be_end_div_shortcode');
-function be_end_div_shortcode($atts) {
+add_shortcode('end-div', 'be_plugin_end_div_shortcode');
+function be_plugin_end_div_shortcode($atts) {
 	return '</div>';
 }
 

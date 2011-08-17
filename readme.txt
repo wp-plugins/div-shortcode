@@ -1,6 +1,6 @@
 === Div Shortcode ===
 Contributors: billerickson
-Donate link: http://www.billerickson.net
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4BJ57JH34CA7A
 Tags: shortcode, div, columns
 Requires at least: 3.0
 Tested up to: 3.1.3

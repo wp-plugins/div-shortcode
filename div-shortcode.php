@@ -388,13 +388,16 @@ class be_div_shortcode {
      * @param  array  $attrs the shortcode attributes
      * @return string the resulting <div>
      */
-    public function div_shortcode( $atts ) {
-		extract( shortcode_atts( array( 'class' => '', 'id' => '' ), $atts ) );
-		$return = '<div';
-		if ( !empty( $class ) ) $return .= ' class="' . $class . '"';
-		if ( !empty( $id ) ) $return .= ' id="' . $id . '"';
-		$return .= '>';
-		return $return;    
+    public function div_shortcode( $attrs ) {
+
+        /* Get supported attributes. */
+        $attrs = shortcode_atts(array('class' => '', 'id' => ''), $attrs);
+
+        return
+            '<div'
+            . (!empty($attrs['class']) ? ' class="' . $attrs['class'] . '"' : '')
+            . (!empty($attrs['id'])    ? ' id="'    . $attrs['id']    . '"' : '')
+            . '>';
 	}
 
     /**

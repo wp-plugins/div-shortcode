@@ -388,7 +388,7 @@ class be_div_shortcode {
      * @param  array  $attrs the shortcode attributes
      * @return string the resulting <div>
      */
-    public function div_shortcode( $attrs ) {
+    public function div_shortcode( $atts ) {
 		extract( shortcode_atts( array( 'class' => '', 'id' => '' ), $atts ) );
 		$return = '<div';
 		if ( !empty( $class ) ) $return .= ' class="' . $class . '"';

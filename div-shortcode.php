@@ -78,7 +78,7 @@ class be_div_shortcode {
      * @var    string
      * @access private
      */
-    const CF_NAME = 'be_div_shortcode';
+    const CF_NAME = '_be_div_shortcode';
 
     /*
      * Initialize the plugin; add its filters.

@@ -372,7 +372,7 @@ class be_div_shortcode {
      * @return string        the two attributes concatenated with a space
      */
     public static function reduce_attrs( $attr1, $attr2 ) {
-        if ( isset( $attr2 ) )
+        if ( isset( $attr2 ) && !empty( $attr2 ) )
             return $attr1 . ' ' . $attr2;
         else
             return $attr1;
@@ -389,14 +389,13 @@ class be_div_shortcode {
      * @return string the resulting <div>
      */
     public function div_shortcode( $attrs ) {
-
-        /* Parse and reduce attributes to a string. */
-        $attrs = shortcode_parse_atts( $attrs );
-        if ( is_array( $attrs ) )
-            $attrs = array_reduce( $attrs, 'be_div_shortcode::reduce_attrs', '' );
-
-        return '<div' . $attrs . '>';
-    }
+		extract( shortcode_atts( array( 'class' => '', 'id' => '' ), $atts ) );
+		$return = '<div';
+		if ( !empty( $class ) ) $return .= ' class="' . $class . '"';
+		if ( !empty( $id ) ) $return .= ' id="' . $id . '"';
+		$return .= '>';
+		return $return;    
+	}
 
     /**
      * Filter the [end-div] shortcode.

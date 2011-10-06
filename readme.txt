@@ -10,24 +10,12 @@ Allows you to create a div by using the shortcodes [div] and [end-div].
 
 == Description ==
 
-This plugin implements shortcode-like behavior for [div][end-div] that won't disappear if the plugin is disabled or deleted.
-
-You can use attributes like id="foo", class="bar", and enabled:
-[div id="foo" class="bar" enabled]...[end-div]
-
-You can use self-closing shortcodes:
-[div id="foo" /]
-
-You can even use nested shortcodes(!):
-[div class="outer"][div class="inner"]...[end-div][end-div]
-
-If you disable this plugin, all your content will appear just like it did before--with no shortcodes. (But you won't see the shortcodes in the edit box either. Just re-enable the plugin to see the shortcodes in the edit box again.)
-
-Portions of this code were adapted from shortcodes.php in WordPress 3.2.1.
-
-Note: [div] is not a real shortcode; you cannot use [/div]. Instead, use [end-div].
+Allows you to create a div by using the shortcodes [div] and [end-div]. To add an id of "foo" and class of "bar", use [div id="foo" class="bar"].
 
 == Changelog ==
+
+= 2.1 = 
+* People are still having issues with the new version and we aren't able to replicate to fix them. I'm reverting back to the original code in 1.0. Sorry for all the updates.
 
 = 2.0.1 =
 * Some people have reported issues with the shortcode no longer working. This (hopefully) fixes it.
@@ -38,3 +26,4 @@ Note: [div] is not a real shortcode; you cannot use [/div]. Instead, use [end-di
 
 = 1.0 =
 * Release of plugin
+

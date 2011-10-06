@@ -1,11 +1,16 @@
 <?php
+
 /*
 Plugin Name: Div Shortcode
-Plugin URI: http://www.billerickson.net
-Description: Allows you to create a div by using the shortcodes [div] and [end-div]. To add an id of "foo" and class of "bar", use [div id="foo" class="bar"]. If plugin is disabled, only the HTML remains (no shortcodes polluting your content).
-Author: Bill Erickson, Dean Hall
-Version: 2.0
-Author URI: http://www.billerickson.net
+ Plugin URI: http://www.billerickson.net
+Description: Allows you tocreate a div by using the shortcodes [div] and
+             [end-div]. To add an id of "foo" and class of "bar", use
+             [div id="foo" and class="bar"]. If plugin is disabled, only the
+             HTML remains (no shortcodes polluting your content).
+    Version: 2.0.1
+     Author: Bill Erickson, Dean Hall
+ Author URI: http://www.billerickson.net
+    License: ?
 */
 
 class be_div_shortcode {
@@ -32,8 +37,7 @@ class be_div_shortcode {
      * @access private
      */
     private static $re_replace =
-        '#(.?)\[div\b(.*?)(/?)\](?:((?:(?R)|.)*?)\[end-div\])?(.?)#sS';
-        //'#(.?)\[div\b(.*)(/?)\]((?:(?R)|.)*)\[end-div\](.?)#sUS';
+        '#(.?)\[div\b(.*?)(?:(/)|\]((?:(?R)|.)*?)\[(?:end-|/)div)\](?(?=[^\[])(.))#sS';
 
     /**
      * the regex to use for testing for the presence of the shortcode
@@ -46,7 +50,7 @@ class be_div_shortcode {
      * @var  string
      */
     private static $re_test =
-        '#\[div\b(?:.*?)(?:/?)\](?:(?:.*?)\[end-div\])?#sS';
+        '#\[div\b(?:.*?)(?:(?:/)|(?:\](?:.*?)\[(?:end-|/)div))\]#sS';
 
     /**
      * the original post, unfiltered (by us)
@@ -67,7 +71,7 @@ class be_div_shortcode {
      * @var    string
      * @access private
      */
-    const CF_NAME = '_be_div_shortcode';
+    const CF_NAME = 'be_div_shortcode';
 
     /**
      * Initialize the plugin; add its filters.
@@ -87,22 +91,45 @@ class be_div_shortcode {
         /* Register admin filters. */
         if (is_admin()) {
 
-            /* Register our wp_insert_post_data filter. */
-            add_filter( 'wp_insert_post_data', 'be_div_shortcode::wp_insert_post_data',  1,  2 );
+            /*
+             * Register our wp_insert_post_data filter.
+             *
+             * This runs right before the post is inserted into/updated in the
+             * DB.
+             */
+            add_filter('wp_insert_post_data',
+                'be_div_shortcode::wp_insert_post_data', 1, 2);
 
-            /* Register our wp_insert_post filter. */
-            add_filter( 'wp_insert_post', 'be_div_shortcode::wp_insert_post',  1,  2 );
+            /*
+             * Register our wp_insert_post filter.
+             *
+             * This runs right after the post is inserted into/updated in the
+             * DB.
+             */
+            add_filter('wp_insert_post',
+                'be_div_shortcode::wp_insert_post', 1, 2);
 
-            /* Register our edit_post_content filter. */
-            add_filter( 'edit_post_content', 'be_div_shortcode::edit_post_content',  1, 2 );
+            /*
+             * Register our edit_post_content filter.
+             *
+             * This runs right before the post edit box is populated.
+             */
+            add_filter('edit_post_content',
+                'be_div_shortcode::edit_post_content', 1, 2);
 
-            /* Register our is_protected_meta filter. */
-            add_filter( 'is_protected_meta', 'be_div_shortcode::is_protected_meta',  1,  2 );
+            /*
+             * Register our is_protected_meta filter.
+             *
+             * This runs right before the "custom fields" meta box is
+             * populated.
+             */
+            add_filter('is_protected_meta',
+                'be_div_shortcode::is_protected_meta', 1, 2);
         }
 
         /* Register real shortcodes for backward compatibility. */
-        add_shortcode( 'div', 'be_div_shortcode::div_shortcode' );
-        add_shortcode( 'end-div', 'be_div_shortcode::end_div_shortcode' );
+        add_shortcode('div',     'be_div_shortcode::div_shortcode');
+        add_shortcode('end-div', 'be_div_shortcode::end_div_shortcode'); 
     }
 
     /**
@@ -125,35 +152,38 @@ class be_div_shortcode {
      * @param  array $raw_post the original, raw post data
      * @return array           the filtered $post array
      */
-    public static function wp_insert_post_data( $post, $raw_post ) {
+    public static function wp_insert_post_data($post, $raw_post) {
 
         /* Don't handle post revisions. */
-        if ( wp_is_post_revision( $post ) )
+        if (wp_is_post_revision($post)) {
             return $post;
+        }
 
         /* For some reason, this gets called twice. Don't do everything twice,
            or it'll ruin everything. */
-        if ( !empty( self::$unfiltered_post ) )
+        if (!empty(self::$unfiltered_post)) {
             return $post;
+        }
 
         /* There's a shortcode to be filtered. */
-        if ( self::content_has_shortcode( $post['post_content'] ) ) {
+        if (self::content_has_shortcode($post['post_content'])) {
 
             /* Store away the unfiltered post. */
             self::$unfiltered_post = $post['post_content'];
 
             /* Filter the post. */
-            $post['post_content'] =
-                self::filter_shortcodes($post['post_content']);
+            $post['post_content'] = self::filter_shortcodes($post['post_content']);
         }
 
         /* There are no shortcodes to filter. Make sure not to use/to delete
            the custom field later. */
-        else
+        else {
             self::$unfiltered_post = '';
+        }
 
         return $post;
-}
+    }
+
     /**
      * Store the unfiltered post content in a custom field after storing the
      * filtered post in the DB.
@@ -177,16 +207,17 @@ class be_div_shortcode {
     public static function wp_insert_post($post_id, $post) {
 
         /* Don't handle post revisions. */
-        if ( wp_is_post_revision( $post ) )
+        if (wp_is_post_revision($post)) {
             return;
+        }
 
         /* No shortcodes; make sure there's no custom field. */
-        if ( empty( self::$unfiltered_post ) )
-            return delete_post_meta( $post_id, self::CF_NAME );
+        if (empty(self::$unfiltered_post)) {
+            return delete_post_meta($post_id, self::CF_NAME);
+        }
 
         /* Store the unfiltered post in a custom field. */
-        return
-            update_post_meta( $post_id, self::CF_NAME, self::$unfiltered_post );
+        return update_post_meta($post_id, self::CF_NAME, self::$unfiltered_post);
     }
 
     /**
@@ -205,19 +236,21 @@ class be_div_shortcode {
      * @return string          the unfiltered content (with [div] and [end-div]
      *                         shortcodes)
      */
-    public static function edit_post_content( $content, $id ) {
-        $post = get_post( $id );
+    public static function edit_post_content($content, $id) {
+        $post = get_post($id);
 
         /* Don't handle post revisions. */
-        if ( wp_is_post_revision( $post ) )
+        if (wp_is_post_revision($post)) {
             return $content;
+        }
 
         /* Try to get the unfiltered content. */
-        $unfiltered = get_post_meta( $id, self::CF_NAME, true );
+        $unfiltered = get_post_meta($id, self::CF_NAME, true);
 
         /* The unfiltered content was retrieved. */
-        if ( !empty( $unfiltered ) )
+        if (!empty($unfiltered)) {
             $content = $unfiltered;
+        }
 
         return $content;
     }
@@ -232,8 +265,8 @@ class be_div_shortcode {
      * @return bool        whether the custom field is protected (and should
      *                     not be displayed)
      */
-    public static function is_protected_meta( $a, $key ) {
-        return ( $key == self::CF_NAME );
+    public static function is_protected_meta($a, $key) {
+        return ($key == self::CF_NAME);
     }
 
     /**
@@ -242,11 +275,10 @@ class be_div_shortcode {
      * @since  2.0
      *
      * @param  string $content some unfiltered post content
-     * @return bool            whether $content contains [div][end-div]
-     *                         shortcodes
+     * @return bool            whether $content contains [div][end-div] shortcodes
      */
-    private static function content_has_shortcode( $content ) {
-        return ( preg_match( self::$re_test, $content ) == 1);
+    private static function content_has_shortcode($content) {
+        return (preg_match(self::$re_test, $content) == 1);
     }
 
     /**
@@ -261,13 +293,8 @@ class be_div_shortcode {
      * @return string          filtered content, free of [div][end-div]
      *                         shortcodes
      */
-    private static function filter_shortcodes( $content ) {
-        return
-            preg_replace_callback(
-                self::$re_replace,
-                'be_div_shortcode::filter_match',
-                $content
-            );
+    private static function filter_shortcodes($content) {
+        return preg_replace_callback(self::$re_replace, 'be_div_shortcode::filter_match', $content);
     }
 
     /**
@@ -316,22 +343,22 @@ class be_div_shortcode {
      * @param  array  $pmatch a preg_* match array of self::$re_replace
      * @return string the shortcode content in $match magically transformed
      */
-    public static function filter_match( $pmatch ) {
+    public static function filter_match($pmatch) {
 
-        /* Allow escaping like this: [[div]] or this:
-           [[div]content[end-div]] */
+        /* Allow escaping like this: [[div]] or this: [[div]content[end-div]] */
         if ($pmatch[1] == '[' && $pmatch[5] == ']') {
-            return substr( $pmatch[0], 1, -1 );
+            return substr($pmatch[0], 1, -1);
         }
 
         /* Parse and reduce attributes to a string. */
-        $attrs = shortcode_parse_atts( $pmatch[2] );
-        if ( is_array( $attrs ) )
-            $attrs =
-                array_reduce( $attrs, 'be_div_shortcode::reduce_attrs', '' );
+        $attrs = shortcode_parse_atts($pmatch[2]);
+
+        if (is_array($attrs)) {
+            $attrs = array_reduce($attrs, 'be_div_shortcode::reduce_attrs', '');
+        }
 
         /* Handle a self-closing tag. */
-        if ( !empty( $pmatch[3] ) ) {
+        if (!empty($pmatch[3])) {
             return
                 $pmatch[1]
                 . '<div'
@@ -341,23 +368,15 @@ class be_div_shortcode {
         }
 
         /* There may or may not be any content. */
-        if ( isset( $pmatch[4] ) ) {
-            if ( self::content_has_shortcode( $pmatch[4] ) ) {
-                $pmatch[4] = self::filter_shortcodes( $pmatch[4] );
-            }
+        if (self::content_has_shortcode($pmatch[4])) {
+            $pmatch[4] = self::filter_shortcodes($pmatch[4]);
         }
-        else
-            $pmatch[4] = '';
 
         /* Glue together the final string. */
-        return
-            $pmatch[1]
-            . '<div'
-            . $attrs
-            . '>'
-            . $pmatch[4]
-            . '</div>'
-            . $pmatch[5];
+        $return = $pmatch[1] . '<div' . $attrs . '>' . $pmatch[4] . '</div>';
+		if( isset( $pmatch[5] ) ) $return .= $pmatch[5];
+		return $return;
+            	
     }
 
     /**
@@ -366,16 +385,17 @@ class be_div_shortcode {
      *
      * @since 2.0
      *
-     * @param  string $attr1 the existing reduced value of all attributes so
-     *                       far
+     * @param  string $attr1 the existing reduced value of all attributes so far
      * @param  string $attr2 the next attribute (if any)
      * @return string        the two attributes concatenated with a space
      */
-    public static function reduce_attrs( $attr1, $attr2 ) {
-        if ( isset( $attr2 ) && !empty( $attr2 ) )
+    public static function reduce_attrs($attr1, $attr2) {
+        if (isset($attr2)) {
             return $attr1 . ' ' . $attr2;
-        else
+        }
+        else {
             return $attr1;
+        }
     }
 
     /**
@@ -388,7 +408,7 @@ class be_div_shortcode {
      * @param  array  $attrs the shortcode attributes
      * @return string the resulting <div>
      */
-    public function div_shortcode( $attrs ) {
+    public function div_shortcode($attrs) {
 
         /* Get supported attributes. */
         $attrs = shortcode_atts(array('class' => '', 'id' => ''), $attrs);
@@ -398,7 +418,7 @@ class be_div_shortcode {
             . (!empty($attrs['class']) ? ' class="' . $attrs['class'] . '"' : '')
             . (!empty($attrs['id'])    ? ' id="'    . $attrs['id']    . '"' : '')
             . '>';
-	}
+    }
 
     /**
      * Filter the [end-div] shortcode.

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: shortcode, div, columns
 Requires at least: 3.0
 Tested up to: 3.1.3
-Stable tag: 2.0
+Stable tag: 2.0.1
 
 Allows you to create a div by using the shortcodes [div] and [end-div]. 
 
@@ -29,7 +29,10 @@ Note: [div] is not a real shortcode; you cannot use [/div]. Instead, use [end-di
 
 == Changelog ==
 
-= 2.0=
+= 2.0.1 =
+* Some people have reported issues with the shortcode no longer working. This (hopefully) fixes it.
+
+= 2.0 =
 * Completely rebuilt by Dean Hall using pseudo-shortcodes. Content is actually stored as html, so if you disable the plugin the div's still work.
 
 

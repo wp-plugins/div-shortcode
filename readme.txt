@@ -12,7 +12,7 @@ Allows you to create a div by using the shortcodes [div] and [end-div].
 
 Allows you to create a div by using the shortcodes [div] and [end-div]. To add an id of "foo" and class of "bar", use [div id="foo" class="bar"].
 
-[Support Forum](https://github.com/billerickson/Div-Shortcode/issues)
+**No support will be provided by the developer**
 
 == Changelog ==
 
